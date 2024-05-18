@@ -1,0 +1,13 @@
+import pandas as pd
+
+# Define the path to the CSV file
+file_path = '2013-data_copy.csv'
+
+# Read the CSV file into a pandas DataFrame, skipping initial rows if necessary
+df = pd.read_csv(file_path, skiprows=4)  # Adjust skiprows to match your file's structure
+
+# Drop unnamed columns if they exist
+df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+
+# Display the DataFrame
+print(df)
