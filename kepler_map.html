@@ -27,52 +27,11 @@
     <div id="map"></div>
     <script>
         const mapboxToken = 'pk.eyJ1IjoiYW5uYWRhaTEiLCJhIjoiY2x3Y2VraXM3MHkzbTJxbXlxOHRmY3VzeCJ9.tu-4Msj5BYX0vHjh6P95oQ';
-        const googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
 
-        function initializeMapWithMapbox(latitude = 0, longitude = 0, zoom = 2) {
-            const mapContainer = document.getElementById('map');
-            try {
-                const map = keplergl.createMap(mapContainer, {
-                    mapboxApiAccessToken: mapboxToken,
-                    viewState: {
-                        latitude: latitude,
-                        longitude: longitude,
-                        zoom: zoom,
-                        bearing: 0,
-                        pitch: 0
-                    }
-                });
-                console.log('Mapbox initialized successfully.');
-            } catch (error) {
-                console.error('Error initializing Mapbox:', error);
-                initializeMapWithGoogle(latitude, longitude, zoom);
-            }
-        }
-
-        function initializeMapWithGoogle(latitude = 0, longitude = 0, zoom = 2) {
-            const mapContainer = document.getElementById('map');
-            try {
-                const map = keplergl.createMap(mapContainer, {
-                    mapProvider: 'google',
-                    mapProviderKey: googleMapsApiKey,
-                    viewState: {
-                        latitude: latitude,
-                        longitude: longitude,
-                        zoom: zoom,
-                        bearing: 0,
-                        pitch: 0
-                    }
-                });
-                console.log('Google Maps initialized successfully.');
-            } catch (error) {
-                console.error('Error initializing Google Maps:', error);
-                initializeWorldMap(latitude, longitude, zoom);
-            }
-        }
-
-        function initializeWorldMap(latitude = 0, longitude = 0, zoom = 2) {
+        function initializeMap(latitude = 0, longitude = 0, zoom = 2) {
             const mapContainer = document.getElementById('map');
             keplergl.createMap(mapContainer, {
+                mapboxApiAccessToken: mapboxToken,
                 viewState: {
                     latitude: latitude,
                     longitude: longitude,
@@ -81,24 +40,22 @@
                     pitch: 0
                 }
             });
-            console.log('Fallback to world map view.');
         }
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
-                initializeMapWithMapbox(latitude, longitude, 10);
+                initializeMap(latitude, longitude, 10);
             }, (error) => {
                 console.error('Error getting user location:', error);
-                initializeMapWithMapbox();
+                initializeMap(); // Default to world view
             });
         } else {
             console.error('Geolocation is not supported by this browser.');
-            initializeMapWithMapbox();
+            initializeMap(); // Default to world view
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 </body>
 </html>
 
