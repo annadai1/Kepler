@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kepler.gl Map</title>
+    <!-- Include Kepler.gl CSS -->
+    <link href="https://unpkg.com/kepler.gl@latest/dist/kepler-gl.css" rel="stylesheet">
+</head>
+<body>
+    <div id="map" style="width: 100%; height: 100vh;"></div>
+
+    <!-- Include Kepler.gl and necessary dependencies -->
+    <script src="https://unpkg.com/react@16.13.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/kepler.gl@latest/dist/kepler-gl.js"></script>
+
+    <script>
+        function initializeMap(latitude, longitude) {
+            const container = document.getElementById('map');
+            const map = keplergl.createMap(container, {
+                mapboxApiAccessToken: 'YOUR_MAPBOX_ACCESS_TOKEN',
+                viewState: {
+                    latitude: latitude,
+                    longitude: longitude,
+                    zoom: 10,
+                    bearing: 0,
+                    pitch: 0
+                }
+            });
+
+            // Add your Kepler.gl map configuration here
+            // e.g., adding data layers, styling, etc.
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                initializeMap(latitude, longitude);
+            }, (error) => {
+                console.error('Error getting user location:', error);
+                // Fallback coordinates if location is not available
+                initializeMap(37.7749, -122.4194); // Example: San Francisco
+            });
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+            // Fallback coordinates if geolocation is not supported
+            initializeMap(37.7749, -122.4194); // Example: San Francisco
+        }
+    </script>
+</body>
+</html>
+
