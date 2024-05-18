@@ -7,15 +7,6 @@
     <link href="https://unpkg.com/kepler.gl@latest/dist/kepler-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/react@17.0.2/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/redux@4.0.5/dist/redux.min.js" crossorigin></scrip<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <title>Kepler.gl Map</title>
-    <link href="https://unpkg.com/kepler.gl@latest/dist/kepler-gl.css" rel="stylesheet">
-    <script src="https://unpkg.com/react@17.0.2/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/redux@4.0.5/dist/redux.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-redux@7.2.1/dist/react-redux.min.js" crossorigin></script>
     <script src="https://unpkg.com/kepler.gl@2.5.6/umd/keplergl.min.js" crossorigin></script>
@@ -35,38 +26,79 @@
 <body>
     <div id="map"></div>
     <script>
-        function initializeMap(latitude, longitude) {
+        const mapboxToken = 'pk.eyJ1IjoiYW5uYWRhaTEiLCJhIjoiY2x3Y2VraXM3MHkzbTJxbXlxOHRmY3VzeCJ9.tu-4Msj5BYX0vHjh6P95oQ';
+        const googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+
+        function initializeMapWithMapbox(latitude = 0, longitude = 0, zoom = 2) {
             const mapContainer = document.getElementById('map');
-            const map = keplergl.createMap(mapContainer, {
-                mapboxApiAccessToken: 'pk.eyJ1IjoiYW5uYWRhaTEiLCJhIjoiY2x3Y2VraXM3MHkzbTJxbXlxOHRmY3VzeCJ9.tu-4Msj5BYX0vHjh6P95oQ',
+            try {
+                const map = keplergl.createMap(mapContainer, {
+                    mapboxApiAccessToken: mapboxToken,
+                    viewState: {
+                        latitude: latitude,
+                        longitude: longitude,
+                        zoom: zoom,
+                        bearing: 0,
+                        pitch: 0
+                    }
+                });
+                console.log('Mapbox initialized successfully.');
+            } catch (error) {
+                console.error('Error initializing Mapbox:', error);
+                initializeMapWithGoogle(latitude, longitude, zoom);
+            }
+        }
+
+        function initializeMapWithGoogle(latitude = 0, longitude = 0, zoom = 2) {
+            const mapContainer = document.getElementById('map');
+            try {
+                const map = keplergl.createMap(mapContainer, {
+                    mapProvider: 'google',
+                    mapProviderKey: googleMapsApiKey,
+                    viewState: {
+                        latitude: latitude,
+                        longitude: longitude,
+                        zoom: zoom,
+                        bearing: 0,
+                        pitch: 0
+                    }
+                });
+                console.log('Google Maps initialized successfully.');
+            } catch (error) {
+                console.error('Error initializing Google Maps:', error);
+                initializeWorldMap(latitude, longitude, zoom);
+            }
+        }
+
+        function initializeWorldMap(latitude = 0, longitude = 0, zoom = 2) {
+            const mapContainer = document.getElementById('map');
+            keplergl.createMap(mapContainer, {
                 viewState: {
                     latitude: latitude,
                     longitude: longitude,
-                    zoom: 10,
+                    zoom: zoom,
                     bearing: 0,
                     pitch: 0
                 }
             });
-
-            // Add your Kepler.gl map configuration here if needed
+            console.log('Fallback to world map view.');
         }
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
-                initializeMap(latitude, longitude);
+                initializeMapWithMapbox(latitude, longitude, 10);
             }, (error) => {
                 console.error('Error getting user location:', error);
-                // Fallback coordinates if location is not available
-                initializeMap(37.7749, -122.4194); // Example: San Francisco
+                initializeMapWithMapbox();
             });
         } else {
             console.error('Geolocation is not supported by this browser.');
-            // Fallback coordinates if geolocation is not supported
-            initializeMap(37.7749, -122.4194); // Example: San Francisco
+            initializeMapWithMapbox();
         }
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 </body>
 </html>
 
