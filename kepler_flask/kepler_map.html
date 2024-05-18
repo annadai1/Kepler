@@ -30,7 +30,7 @@
 
         function initializeMap(latitude = 0, longitude = 0, zoom = 2) {
             const mapContainer = document.getElementById('map');
-            keplergl.createMap(mapContainer, {
+            const map = keplergl.createMap(mapContainer, {
                 mapboxApiAccessToken: mapboxToken,
                 viewState: {
                     latitude: latitude,
@@ -40,21 +40,36 @@
                     pitch: 0
                 }
             });
+
+            // Load world flights data
+            fetch('https://raw.githubusercontent.com/keplergl/kepler.gl-data/master/earthquakes/data.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    const rows = csvData.split('\n').slice(1);
+                    const data = rows.map(row => row.split(','));
+                    map.addDataToMap({
+                        datasets: {
+                            info: { label: 'World Flights', id: 'world_flights' },
+                            data: {
+                                fields: [
+                                    { name: 'date', format: 'YYYY-M-D', type: 'timestamp' },
+                                    { name: 'latitude', format: '', type: 'real' },
+                                    { name: 'longitude', format: '', type: 'real' },
+                                    { name: 'depth', format: '', type: 'integer' },
+                                    { name: 'magnitude', format: '', type: 'real' },
+                                    { name: 'airport', format: '', type: 'string' },
+                                    { name: 'country', format: '', type: 'string' }
+                                ],
+                                rows: data
+                            }
+                        },
+                        config: {}
+                    });
+                });
         }
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                initializeMap(latitude, longitude, 10);
-            }, (error) => {
-                console.error('Error getting user location:', error);
-                initializeMap(); // Default to world view
-            });
-        } else {
-            console.error('Geolocation is not supported by this browser.');
-            initializeMap(); // Default to world view
-        }
+        // Initialize map with default world view
+        initializeMap();
     </script>
 </body>
 </html>
